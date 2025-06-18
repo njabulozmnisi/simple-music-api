@@ -51,14 +51,24 @@ export class PlaylistsService {
       };
     }
 
-    return playlists;
+    return playlists.map((playlist) => ({
+      ...playlist,
+      playtime: playlist.trackList.reduce(
+        (sum, pt) => sum + pt.track.duration,
+        0,
+      ),
+    }));
   }
 
   async findOne(id: string) {
     const playlist = await this.databaseService.playlist.findUnique({
       where: { id },
       include: {
-        trackList: true,
+        trackList: {
+          include: {
+            track: true,
+          },
+        },
       },
     });
 
@@ -66,7 +76,12 @@ export class PlaylistsService {
       throw new NotFoundException(`Playlist with ID '${id}' not found.`);
     }
 
-    return playlist;
+    const playtime = playlist.trackList.reduce(
+      (sum, pt) => sum + pt.track.duration,
+      0,
+    );
+
+    return { ...playlist, playtime };
   }
 
   async update(id: string, updatePlaylistDto: UpdatePlaylistDto) {

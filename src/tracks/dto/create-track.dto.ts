@@ -1,4 +1,4 @@
-import { IsString, IsNotEmpty, IsInt } from 'class-validator';
+import { IsString, IsNotEmpty, IsInt, Min } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateTrackDto {
@@ -23,6 +23,7 @@ export class CreateTrackDto {
     required: true,
   })
   @IsInt()
+  @Min(1, { message: 'Duration must be greater than 0 seconds.' })
   duration: number;
 
   @ApiProperty({
